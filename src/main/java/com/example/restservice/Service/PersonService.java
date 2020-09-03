@@ -19,49 +19,48 @@ public class PersonService {
         persons.add(new Person("Meier", "Max", 2));
     }
 
-    public ResponseEntity<List<Person>> getAllPerson() {
-        return new ResponseEntity<>(persons, HttpStatus.OK);
+    public List<Person> getAllPerson() {
+        return persons;
     }
 
-    public ResponseEntity<Person> getOnePersonById(int id) {
+    public Person getOnePersonById(int id) {
         for (Person person : persons) {
             if (person.getId() == id) {
-                return new ResponseEntity<>(person, HttpStatus.OK);
+                return person;
             }
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        throw new RuntimeException("Person nicht gefunden!");
     }
 
-    public ResponseEntity<Person> addOnePerson(Person person) {
+    public Person addOnePerson(Person person) {
         if (persons.contains(person)) {
-            return new ResponseEntity<>(person, HttpStatus.CONFLICT);
+            throw new RuntimeException("Person schon vorhanden");
         } else {
             persons.add(person);
-            return new ResponseEntity<>(person, HttpStatus.OK);
+            return person;
         }
-
     }
 
-    public ResponseEntity<Person> updateOnePerson(int id, Person person) {
+    public Person updateOnePerson(int id, Person person) {
         person.setId(id);
         for (Person updatePerson : persons) {
             if (updatePerson.getId() == id) {
                 int personIndex = persons.indexOf(updatePerson);
                 persons.set(personIndex, person);
-                return new ResponseEntity<>(person, HttpStatus.OK);
+                return person;
             }
         }
-        return new ResponseEntity<>(person, HttpStatus.NOT_FOUND);
+        throw new RuntimeException("Person nicht gefunden!");
     }
 
-    public ResponseEntity<String> deleteOnePerson(int id) {
+    public String deleteOnePerson(int id) {
         for (Person deletePerson : persons) {
             if (deletePerson.getId() == id) {
                 persons.remove(deletePerson);
-                return new ResponseEntity<>("Person gelöscht", HttpStatus.OK);
+                return ("Person wurde erfolgreich gelöscht.");
             }
         }
-        return new ResponseEntity<>("Person nicht vorhanden", HttpStatus.NOT_FOUND);
+        throw new RuntimeException("Person wurde nicht gefunden!");
     }
 
 }

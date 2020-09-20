@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/v1")
@@ -26,9 +27,10 @@ public class PersonController {
     }
 
     @GetMapping("persons/{id}")
-    public ResponseEntity<Person> getPersonById(@PathVariable int id) {
+    public ResponseEntity<Person> getPersonById(@PathVariable String id) {
         try {
-            return new ResponseEntity<>(personService.getOnePersonById(id), HttpStatus.OK);
+            Optional<Person> person = personService.getOnePersonById(id);
+            return new ResponseEntity(person, HttpStatus.OK);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -44,7 +46,7 @@ public class PersonController {
     }
 
     @PutMapping(value = "persons/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Person> updatePerson(@PathVariable int id, @RequestBody Person person) {
+    public ResponseEntity<Person> updatePerson(@PathVariable String id, @RequestBody Person person) {
         try {
             return new ResponseEntity<>(personService.updateOnePerson(id, person), HttpStatus.OK);
         } catch (RuntimeException e) {
@@ -53,9 +55,10 @@ public class PersonController {
     }
 
     @DeleteMapping(value = "persons/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> deletePerson(@PathVariable int id) {
+    public ResponseEntity deletePerson(@PathVariable String id) {
         try {
-            return new ResponseEntity<>(personService.deleteOnePerson(id), HttpStatus.OK);
+            personService.deleteOnePerson(id);
+            return new ResponseEntity(HttpStatus.OK);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }

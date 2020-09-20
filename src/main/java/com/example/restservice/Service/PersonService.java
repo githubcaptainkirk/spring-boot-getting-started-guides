@@ -1,66 +1,51 @@
 package com.example.restservice.Service;
 
 import com.example.restservice.Entitiy.Person;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.example.restservice.Repository.PersonRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PersonService {
 
     private List<Person> persons;
 
-    PersonService() {
-        persons = new ArrayList<>();
-        persons.add(new Person("Kirk", "Murat", 1));
-        persons.add(new Person("Meier", "Max", 2));
-    }
+    @Autowired
+    PersonRepository personRepository;
 
     public List<Person> getAllPerson() {
-        return persons;
+        return personRepository.findAll();
     }
 
-    public Person getOnePersonById(int id) {
-        for (Person person : persons) {
-            if (person.getId() == id) {
-                return person;
-            }
+    public Optional<Person> getOnePersonById(String id) {
+        if (personRepository.findById(id).isPresent()) {
+            return personRepository.findById(id);
+        } else {
+            throw new RuntimeException("Person nicht gefunden!");
         }
-        throw new RuntimeException("Person nicht gefunden!");
     }
 
     public Person addOnePerson(Person person) {
-        if (persons.contains(person)) {
-            throw new RuntimeException("Person schon vorhanden");
-        } else {
-            persons.add(person);
-            return person;
-        }
+        return personRepository.save(person);
     }
 
-    public Person updateOnePerson(int id, Person person) {
+    public Person updateOnePerson(String id, Person person) {
         person.setId(id);
-        for (Person updatePerson : persons) {
-            if (updatePerson.getId() == id) {
-                int personIndex = persons.indexOf(updatePerson);
-                persons.set(personIndex, person);
-                return person;
-            }
+        if (personRepository.findById(id).isPresent()) {
+            return personRepository.save(person);
         }
         throw new RuntimeException("Person nicht gefunden!");
     }
 
-    public String deleteOnePerson(int id) {
-        for (Person deletePerson : persons) {
-            if (deletePerson.getId() == id) {
-                persons.remove(deletePerson);
-                return ("Person wurde erfolgreich gelöscht.");
-            }
+    public void deleteOnePerson(String id) {
+        if (personRepository.findById(id).isPresent()) {
+           personRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Person wurde nicht gefunden!");
         }
-        throw new RuntimeException("Person wurde nicht gefunden!");
     }
 
 }
